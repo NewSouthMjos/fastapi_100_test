@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
@@ -16,7 +17,25 @@ def get_posts(
     order: schemas.Order = schemas.Order.DESC,
     session: Session = Depends(get_db),
 ) -> schemas.PostsOut:
-    return schemas.PostsOut(posts=posts.get(per_page, per_page*page, order, session))
+    return schemas.PostsOut(posts=posts.get(per_page, per_page * page, order, session))
+
+
+@router.get("/posts_synthetic")
+def posts_synthetic(
+    per_page: int = 10,
+) -> schemas.PostsOut:
+    return schemas.PostsOut(
+        posts=[
+            schemas.PostOut(
+                id=i,
+                published_at=datetime(2023, 6, 30, 12, 0, 0),
+                updated_at=datetime(2023, 6, 30, 12, 0, 0),
+                title="Статья",
+                content="Съешь ещё этих мягких французских булок, да выпей же чаю.",
+            )
+            for i in range(per_page)
+        ]
+    )
 
 
 @router.get("/posts/{post_id}")

@@ -34,7 +34,7 @@ services:
       - 8000:8000
     build:
       context: ./app100
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     # command: "alembic revision --autogenerate --rev-id 000000000001 -m init"
 
     volumes:

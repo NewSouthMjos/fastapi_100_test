@@ -36,7 +36,7 @@ do
 
 done
 
-printf "requests/second READ   %14s \n" "fastapi_098"
+printf "requests/second READ DB  %14s \n" "fastapi_098"
 for i in $(seq 1 $r)
 do
     sleep 0.2
@@ -44,6 +44,16 @@ do
     printf "#%s              %15s\n" $i $fastapi_098_rs_l
 
 done
+
+printf "requests/second READ synthetic  %14s \n" "fastapi_098"
+for i in $(seq 1 $r)
+do
+    sleep 0.2
+    fastapi_098_rs_l=$(docker run --network=fastapi_test apache2_ab sh -c "ab -q -n ${n} -c ${c} http://fastapi_098:8000/posts_synthetic?per_page=100 | grep 'Requests per second' | tr -dc '0-9.0-9'")
+    printf "#%s              %15s\n" $i $fastapi_098_rs_l
+
+done
+
 echo "sleeping 1"
 sleep 1
 fastapi_098_mu=$(docker stats fastapi_098 --no-stream --format "{{.MemUsage}}" | cut -d '/' -f 1)
@@ -74,6 +84,15 @@ for i in $(seq 1 $r)
 do
     sleep 0.2
     fastapi_100_rs_l=$(docker run --network=fastapi_test apache2_ab sh -c "ab -q -n ${n} -c ${c} http://fastapi_100:8000/posts?per_page=100 | grep 'Requests per second' | tr -dc '0-9.0-9'")
+    printf "#%s              %15s\n" $i $fastapi_100_rs_l
+
+done
+
+printf "requests/second READ synthetic  %14s \n" "fastapi_098"
+for i in $(seq 1 $r)
+do
+    sleep 0.2
+    fastapi_100_rs_l=$(docker run --network=fastapi_test apache2_ab sh -c "ab -q -n ${n} -c ${c} http://fastapi_100:8000/posts_synthetic?per_page=100 | grep 'Requests per second' | tr -dc '0-9.0-9'")
     printf "#%s              %15s\n" $i $fastapi_100_rs_l
 
 done
