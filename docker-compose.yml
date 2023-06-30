@@ -1,0 +1,86 @@
+services:
+  fastapi_098:
+    container_name: fastapi_098
+    restart: no
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@fastapi_test_db:5432/postgres
+      - LOG_LEVEL=info
+      - WEB_CONCURRENCY=1
+      - PORT=8000
+    ports:
+      - 8000:8000
+    build:
+      context: ./app098
+      dockerfile: ./Dockerfile
+    # command: "alembic revision --autogenerate --rev-id 000000000001 -m init"
+
+    volumes:
+      - ./app098/alembic/versions:/app098/alembic/versions:rw
+    networks:
+        - fastapi_test
+    depends_on:
+      fastapi_test_db:
+        condition: service_healthy
+
+  fastapi_100:
+    container_name: fastapi_100
+    restart: no
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@fastapi_test_db:5432/postgres
+      - LOG_LEVEL=info
+      - WEB_CONCURRENCY=1
+      - PORT=8000
+    ports:
+      - 8000:8000
+    build:
+      context: ./app100
+      dockerfile: ./Dockerfile.dev
+    # command: "alembic revision --autogenerate --rev-id 000000000001 -m init"
+
+    volumes:
+      - ./app100/alembic/versions:/app100/alembic/versions:rw
+    networks:
+        - fastapi_test
+    depends_on:
+      fastapi_test_db:
+        condition: service_healthy
+
+  fastapi_test_db:
+    image: postgres:15
+    container_name: fastapi_test_db
+    environment:
+        - POSTGRES_DB=test
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+    ports:
+        - 5432:5432
+    volumes:
+        - fastapi_test_db_volume:/var/lib/postgresql/data
+    networks:
+        - fastapi_test
+    healthcheck:
+        test: ["CMD-SHELL", "psql -U postgres -c 'select 1'"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+  test_client:
+    container_name: test_client
+    # volumes:
+    #     - ./test_post.json:/test_post.json
+    # command: "ab -p test_post.json -T application/json -c 10 -n 1000 http://fastapi_100:8000/posts"
+    # command: "ab -n 1000 -c 10 http://fastapi_100:8000/posts?per_page=100"
+
+    build:
+      dockerfile: ./Dockerfile_test_client
+    networks:
+        - fastapi_test
+
+
+networks:
+  fastapi_test:
+    name: fastapi_test
+
+volumes: 
+    fastapi_test_db_volume:
+      name: fastapi_test_db_volume

@@ -1,0 +1,3 @@
+FROM alpine:latest
+COPY test_post.json test_post.json
+RUN apk upgrade && apk add apache2-utils

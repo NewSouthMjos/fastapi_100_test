@@ -1,0 +1,7 @@
+\.idea
+*__pycache__*
+*.pyc
+venv
+.vscode/
+test.py
+old/
